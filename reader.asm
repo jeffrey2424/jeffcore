@@ -25,6 +25,7 @@ func:
 	mov ebx, [fd_in]
 	mov ecx, info
 	mov edx, 24
+	int 0x80
 
 	; Print to stdout
 	mov eax, 4
@@ -40,7 +41,7 @@ func:
 
 section	.data
 file_name db '/home/jeffrey_t_sharpe/jeffcore_project/jeffcore/base_calc.jeff'
-len 24
+
 
 section .bss
 fd_out resb 1
