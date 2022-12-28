@@ -24,14 +24,14 @@ func:
 	mov eax, 3
 	mov ebx, [fd_in]
 	mov ecx, info
-	mov edx, 24
+	mov edx, 999
 	int 0x80
 
 	; Print to stdout
 	mov eax, 4
 	mov ebx, 1
 	mov ecx, info
-	mov edx, 24
+	mov edx, 999
 	int 0x80
 
 	mov esp, ebp
@@ -46,5 +46,5 @@ file_name db '/home/jeffrey_t_sharpe/jeffcore_project/jeffcore/base_calc.jeff'
 section .bss
 fd_out resb 1
 fd_in  resb 1
-info resb  24
+info resb  999
 	
