@@ -1,5 +1,7 @@
 import argparse
-
+from typing import List
+from string import Template
+from config_template import OUTPUT_TEMPLATE
 
 def read_file(file_path: str) -> str:
     """Read a file, and return the text content
@@ -8,56 +10,109 @@ def read_file(file_path: str) -> str:
         contents = f.read()
     return contents
 
-def split_contents_to_individual_commands(file_contents: str) -> list[str]:
+def split_contents_to_individual_commands(file_contents: str) -> List[str]:
     """
     """
     unclean_commands = file_contents.split(";")
     return [command.strip().lower() for command in unclean_commands if command.strip()]
     
-def process_command(command, previous_val=None):
-    command_split = command.split(' ')
-    command_kw = command_split[0]
-    try:
-        command_val = int(command_split[1])
-    except IndexError:
-        pass
-    except ValueError:
-        raise(f"Cannot process value {command_split[1]}")
+
+class CommandGen:
+    def __init__(self, command):
+        self.raw_command = command
+        self.command_split = self.raw_command.split(' ')
+        self.command_kw = self.command_split[0]
+        try:
+            self.command_val = int(self.command_split[1])
+        except IndexError:
+            pass
+        except ValueError:
+            raise(f"Cannot process value {self.command_split[1]}")
+        
+        self.pop = "\tpop rax\n"
+        self.push = "\tpush rax\n"
     
-    if command_kw == "start":
-        return command_val
-    if command_kw == "add":
-        return previous_val + command_val
-    if command_kw == "sub":
-        return previous_val - command_val
-    if command_kw == "mul":
-        return previous_val * command_val
-    if command_kw == "div":
-        return int(previous_val / command_val)
-    if command_kw == "end":
-        return previous_val
+    def generate(self):
+        if self.command_kw=="start":
+            return self.start()
+        if self.command_kw=="add":
+            return self.add()
+        if self.command_kw=="sub":
+            return self.sub()
+        if self.command_kw=="mul":
+            return self.mul()
+        if self.command_kw=="div":
+            return self.div()
+        if self.command_kw=="end":
+            return self.end()
+        else:
+            raise ValueError(f"Cannot process value {self.command_split[1]}")
     
-    raise ValueError(f"Keyword {command_kw} not valid")
+    def start(self):
+        comment = f"\n\t; start {self.command_val}\n"
+        command_asm = f"\tmov rax, {self.command_val}\n"
+        return comment + command_asm + self.push
 
-def process_command_list(command_list):
-    out_value = 0
-    for command in command_list:
-        out_value = process_command(command, out_value)
-    return out_value
+    def add(self):
+        comment = f"\n\t; add {self.command_val}\n"
+        command_asm = f"\tadd rax, {self.command_val}\n"
+        return comment + self.pop + command_asm + self.push
+    
+    def sub(self):
+        comment = f"\n\t; subtract {self.command_val}\n"
+        command_asm = f"\sub rax, {self.command_val}\n"
+        return comment + self.pop + command_asm + self.push
+    
+    def mul(self):
+        comment = f"\n\t; multiply {self.command_val}\n"
+        command_asm = f"\timul rax, {self.command_val}\n"
+        return comment + self.pop + command_asm + self.push
+
+    def div(self):
+        comment = f"\n\t; divide {self.command_val}\n"
+        command_asm = f"\tmov rbx, {self.command_val}\n\tidiv rbx\n"
+        return comment + self.pop + command_asm + self.push
+    
+    def end(self):
+        return "\n\t; End of script\n"
 
 
-def main(filename):
+
+def process_command_list(command_list: List[str]) -> str:
+    processed_list = [CommandGen(command).generate() for command in command_list]
+    return ''.join(processed_list)
+
+
+def populate_template(
+        processed_comands: str,
+        output_file: str,
+        template=OUTPUT_TEMPLATE
+    ) -> str:
+    template_string = Template(OUTPUT_TEMPLATE)
+    process_command_dict = {"CONFIGURED_COMMANDS": processed_comands}
+    populated_template = template_string.substitute(process_command_dict)
+
+    with open(output_file, "w") as f:
+        f.write(populated_template)
+    return populated_template
+
+
+def main(filename, output_filename):
+    if not output_filename:
+        output_filename = filename.split(".")[0] + ".asm"
+
     contents = read_file(filename)
     command_list = split_contents_to_individual_commands(contents)
-    out = process_command_list(command_list)
-    print(out)
-    return out
+    processed_commands = process_command_list(command_list)
+    populated_template = populate_template(processed_commands, output_filename)
+    print(f"Successpully compiled code to assmebly, at path: {output_filename}")
+    return populated_template
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("filename")
-
+    parser.add_argument("--output", "-o", required=False)
     args = parser.parse_args()
 
-    main(args.filename)
+    main(args.filename, args.output)

@@ -1,9 +1,6 @@
 start 3;
 add 2;
-div 2;
+div 4;
 add 17;
-mul 37;
+mul 39;
 end;
-
-/c/Users/jeffr/AppData/Local/bin
-/c/Program\ Files/LLVM/bin/lld.exe

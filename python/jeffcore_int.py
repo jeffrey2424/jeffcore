@@ -1,4 +1,5 @@
 import argparse
+from typing import List
 
 
 def read_file(file_path: str) -> str:
@@ -8,7 +9,7 @@ def read_file(file_path: str) -> str:
         contents = f.read()
     return contents
 
-def split_contents_to_individual_commands(file_contents: str) -> list[str]:
+def split_contents_to_individual_commands(file_contents: str) -> List[str]:
     """
     """
     unclean_commands = file_contents.split(";")
