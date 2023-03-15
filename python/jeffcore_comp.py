@@ -60,7 +60,7 @@ class CommandGen:
     
     def sub(self):
         comment = f"\n\t; subtract {self.command_val}\n"
-        command_asm = f"\sub rax, {self.command_val}\n"
+        command_asm = f"\tsub rax, {self.command_val}\n"
         return comment + self.pop + command_asm + self.push
     
     def mul(self):
@@ -70,11 +70,13 @@ class CommandGen:
 
     def div(self):
         comment = f"\n\t; divide {self.command_val}\n"
-        command_asm = f"\tmov rbx, {self.command_val}\n\tidiv rbx\n"
+        command_asm = f"\tmov rdx, 0\n\tmov rbx, {self.command_val}\n\tidiv rbx\n"
         return comment + self.pop + command_asm + self.push
     
     def end(self):
-        return "\n\t; End of script\n"
+        comment = "\n\t; End of script\n"
+        command_asm = "\tcall _printInt\n"
+        return comment + command_asm
 
 
 
@@ -96,10 +98,19 @@ def populate_template(
         f.write(populated_template)
     return populated_template
 
+def confirm_output(filename, output_dir):
+    if output_dir:
+        partial_filename = filename.split("/")[-1].split(".")[0] + ".asm"
+        if output_dir[-1] != "/":
+            output_dir += "/"
+        return output_dir + partial_filename
+    
+    return filename.split(".")[0] + ".asm"
 
-def main(filename, output_filename):
-    if not output_filename:
-        output_filename = filename.split(".")[0] + ".asm"
+
+
+def main(filename, output_dir):
+    output_filename = confirm_output(filename, output_dir)
 
     contents = read_file(filename)
     command_list = split_contents_to_individual_commands(contents)

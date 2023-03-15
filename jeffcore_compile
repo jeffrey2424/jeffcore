@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+# Parse inputs
+while getopts 'aeo:' OPTION; do
+  case "$OPTION" in
+    a)
+      echo "Keeping assembly scripts" && export assembly_keep=1
+      ;;
+    e)
+      echo "Executing directly" && export execute=1
+      ;;
+    o)
+      output_dir="$OPTARG"
+      echo "Outputing to dir $OPTARG"
+      ;;
+    ?)
+      echo "script usage: $(basename \$0) [-a] [-e] [-o somevalue]" >&2
+      exit 1
+      ;;
+  esac
+done
+shift "$(($OPTIND -1))"
+
+input_file=$*
+
+if [[ -z output_dir ]]
+then 
+    ./python/dist/jeffcore_comp $input_file -o $output_dir
+else
+    ./python/dist/jeffcore_comp $input_file
+fi

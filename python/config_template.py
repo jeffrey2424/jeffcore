@@ -10,15 +10,12 @@ section .text
 _start:
     $CONFIGURED_COMMANDS
 
-    call _printRAX
-
- 
     mov rax, 60
     mov rdi, 0
     syscall
  
  
-_printRAX:
+_printInt:
     mov rcx, digitSpace
     mov rbx, 10
     mov [rcx], rbx
@@ -26,7 +23,7 @@ _printRAX:
     mov [digitSpacePos], rcx
 
     cmp rax, 0
-    jg _printRAXLoop
+    jg _printIntLoop
 
     mov dl, 0x01
     mov rcx, negativeFlag
@@ -39,7 +36,7 @@ _printRAX:
     
 
  
-_printRAXLoop:
+_printIntLoop:
     mov rdx, 0
     mov rbx, 10
     div rbx
@@ -53,11 +50,11 @@ _printRAXLoop:
     
     pop rax
     cmp rax, 0
-    jne _printRAXLoop
+    jne _printIntLoop
 
     mov rcx, [negativeFlag]
     cmp rcx, 0x01
-    jne _printRAXLoop2
+    jne _printIntLoopPrinter
 
     mov dl, 0x2d
     mov rcx, [digitSpacePos]
@@ -65,7 +62,7 @@ _printRAXLoop:
     inc rcx
     mov [digitSpacePos], rcx
  
-_printRAXLoop2:
+_printIntLoopPrinter:
     mov rcx, [digitSpacePos]
  
     mov rax, 1
@@ -79,7 +76,7 @@ _printRAXLoop2:
     mov [digitSpacePos], rcx
  
     cmp rcx, digitSpace
-    jge _printRAXLoop2
+    jge _printIntLoopPrinter
  
     ret
 """
