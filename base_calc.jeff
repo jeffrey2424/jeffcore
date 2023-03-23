@@ -1,5 +1,0 @@
-start 0;
-add 4;
-sub 2;
-div 2;
-end;

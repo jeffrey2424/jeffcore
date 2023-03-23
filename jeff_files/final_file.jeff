@@ -1,0 +1,8 @@
+start 200;
+sub 500;
+mul 4;
+div 6;
+div 7;
+div 1;
+add 3;
+end;

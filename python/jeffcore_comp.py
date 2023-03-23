@@ -70,7 +70,7 @@ class CommandGen:
 
     def div(self):
         comment = f"\n\t; divide {self.command_val}\n"
-        command_asm = f"\tmov rdx, 0\n\tmov rbx, {self.command_val}\n\tidiv rbx\n"
+        command_asm = f"\tcqo\n\tmov rbx, {self.command_val}\n\tidiv rbx\n"
         return comment + self.pop + command_asm + self.push
     
     def end(self):
