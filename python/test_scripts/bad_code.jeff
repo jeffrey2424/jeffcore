@@ -1,9 +1,0 @@
-start 3;
-add 2;
-div 4;
-add 17;
-mul 39;
-div 2;
-end;
-add 1;
-end;

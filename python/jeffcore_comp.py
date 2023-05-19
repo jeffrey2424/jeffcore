@@ -87,8 +87,7 @@ def process_command_list(command_list: List[str]) -> str:
 
 def populate_template(
         processed_comands: str,
-        output_file: str,
-        template=OUTPUT_TEMPLATE
+        output_file: str
     ) -> str:
     template_string = Template(OUTPUT_TEMPLATE)
     process_command_dict = {"CONFIGURED_COMMANDS": processed_comands}
